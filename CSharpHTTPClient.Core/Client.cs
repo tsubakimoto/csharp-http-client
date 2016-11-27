@@ -7,11 +7,12 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
-using System.Web;
 
 namespace SendGrid.CSharp.HTTP.Client
 {
+#if NET40
+    using System.Web.Script.Serialization;
+    using System.Web;
     public class Response
     {
         public HttpStatusCode StatusCode;
@@ -371,4 +372,6 @@ namespace SendGrid.CSharp.HTTP.Client
             }
         }
     }
+#else
+#endif
 }
