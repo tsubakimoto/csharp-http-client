@@ -373,5 +373,51 @@ namespace SendGrid.CSharp.HTTP.Client
         }
     }
 #else
+    using Newtonsoft.Json;
+
+    public class Response
+    {
+        public HttpStatusCode StatusCode;
+        public HttpContent Body;
+        public HttpResponseHeaders Headers;
+
+        /// <summary>
+        ///     Holds the response from an API call.
+        /// </summary>
+        /// <param name="statusCode">https://msdn.microsoft.com/en-us/library/system.net.httpstatuscode(v=vs.110).aspx</param>
+        /// <param name="responseBody">https://msdn.microsoft.com/en-us/library/system.net.http.httpcontent(v=vs.118).aspx</param>
+        /// <param name="responseHeaders">https://msdn.microsoft.com/en-us/library/system.net.http.headers.httpresponseheaders(v=vs.118).aspx</param>
+        public Response(HttpStatusCode statusCode, HttpContent responseBody, HttpResponseHeaders responseHeaders)
+        {
+            StatusCode = statusCode;
+            Body = responseBody;
+            Headers = responseHeaders;
+        }
+
+        /// <summary>
+        ///     Converts string formatted response body to a Dictionary.
+        /// </summary>
+        /// <param name="content">https://msdn.microsoft.com/en-us/library/system.net.http.httpcontent(v=vs.118).aspx</param>
+        /// <returns>Dictionary object representation of HttpContent</returns>
+        public virtual Dictionary<string, dynamic> DeserializeResponseBody(HttpContent content)
+        {
+            return JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(content.ReadAsStringAsync().Result);
+        }
+
+        /// <summary>
+        ///     Converts string formatted response headers to a Dictionary.
+        /// </summary>
+        /// <param name="content">https://msdn.microsoft.com/en-us/library/system.net.http.headers.httpresponseheaders(v=vs.118).aspx</param>
+        /// <returns>Dictionary object representation of  HttpRepsonseHeaders</returns>
+        public virtual Dictionary<string, string> DeserializeResponseHeaders(HttpResponseHeaders content)
+        {
+            var dsContent = new Dictionary<string, string>();
+            foreach (var pair in content)
+            {
+                dsContent.Add(pair.Key, pair.Value.First());
+            }
+            return dsContent;
+        }
+    }
 #endif
 }
